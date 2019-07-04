@@ -1,0 +1,71 @@
+{
+	"name": "iachallenges-server",
+	"version": "1.0.0",
+	"description": "Server side of the iachallenge project",
+	"main": "src/index.ts",
+	"author": "Murillo Ferreira",
+	"license": "MIT",
+	"scripts": {
+		"start": "cross-env NODE_ENV=development nodemon --exec ts-node ./src/index.ts",
+		"stop": "sudo fuser 4000/tcp -k",
+		"test": "cross-env NODE_ENV=test jest --forceExit --bail",
+		"test:circleCi": "cross-env NODE_ENV=test_circle_ci jest --forceExit --bail",
+		"test:watch": "cross-env NODE_ENV=test jest --watch",
+		"test:coverage": "cross-env NODE_ENV=test jest --coverage",
+		"tslint": "tslint \"src/**/*.{ts,tsx}\" --fix",
+		"precommit": "yarn test && lint-staged",
+		"prettify": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\""
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "yarn precommit"
+		}
+	},
+	"lint-staged": {
+		"linters": {
+			"src/**/*.{js,jsx,ts,tsx}": [
+				"prettier --write",
+				"git add"
+			],
+			"*.{ts,tsx}": [
+				"tslint -c tslint.json --fix",
+				"git add"
+			]
+		},
+		"ignore": [
+			"node_modules/**/*"
+		]
+	},
+	"dependencies": {
+		"apollo-server": "^2.6.7",
+		"apollo-server-express": "^2.6.7",
+		"bcryptjs": "^2.4.3",
+		"cross-env": "^5.2.0",
+		"dotenv": "^8.0.0",
+		"express": "^4.17.1",
+		"glob": "^7.1.4",
+		"graphql": "^14.4.2",
+		"graphql-middleware": "^3.0.2",
+		"jsonwebtoken": "^8.5.1",
+		"merge-graphql-schemas": "^1.5.8",
+		"pg": "^7.11.0",
+		"ts-jest": "^24.0.2",
+		"typeorm": "^0.2.18"
+	},
+	"devDependencies": {
+		"@types/dotenv": "^6.1.1",
+		"@types/glob": "^7.1.1",
+		"@types/graphql": "^14.2.2",
+		"@types/jest": "^24.0.15",
+		"@types/jsonwebtoken": "^8.3.2",
+		"apollo-server-testing": "^2.6.7",
+		"husky": "^3.0.0",
+		"jest": "^24.8.0",
+		"lint-staged": "^9.0.2",
+		"nodemon": "^1.19.1",
+		"prettier": "^1.18.2",
+		"ts-node": "^8.3.0",
+		"tslint": "^5.18.0",
+		"typescript": "^3.5.2"
+	}
+}

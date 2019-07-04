@@ -1,0 +1,14 @@
+type Query {
+	# Dummy login to get a valid credential
+	login: String!
+	# Dummy query to verify if auth middleware is working or not.
+	# Returns true if the auth middleware is working.
+	me: Boolean!
+	# Dummy query to verify is auth middleware and role middleware is working.
+	myRole: Role!
+}
+
+type Role {
+	accessLevel: Int!
+	scope: Int!
+}

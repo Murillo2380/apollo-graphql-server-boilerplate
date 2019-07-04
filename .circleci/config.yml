@@ -1,0 +1,96 @@
+# Use the latest 2.1 version of CircleCI pipeline processing engine, see https://circleci.com/docs/2.0/configuration-reference/
+version: 2.1
+
+aliases:
+    - &store_test_results
+      store_test_results:
+          path: ~/repo/test_results.xml
+    - &persist_to_workspace
+      persist_to_workspace:
+          root: ~/repo
+          paths: ["."]
+    - &attach_workspace
+      attach_workspace:
+          at: .
+
+executors:
+    node:
+        docker:
+            - image: circleci/node:11.7.0 # the primary container, where your job's commands are run
+              environment:
+                  SERVER_PORT: 4000
+                  GRAPHQL_ENDPOINT: "/"
+                  TYPEORM_DB_TEST_HOST: "localhost"
+                  TYPEORM_DB_TEST_USERNAME: "root"
+                  TYPEORM_DB_TEST_PASSWORD:
+                  TYPEORM_DB_TEST_NAME: "circle_test"
+                  JWT_SIGNATURE: "some_secret"
+
+            - image: circleci/postgres:9.6.5-alpine-ram
+
+        working_directory: ~/repo
+
+commands:
+    install_db_client:
+        steps:
+            - run:
+                  name: Installing database client
+                  command: sudo apt-get update && sudo apt-get install postgresql-client-9.6
+    yarn_install:
+        steps:
+            - run:
+                  name: Installing Dependencies
+                  command: yarn install --frozen-lockfile
+    yarn_lint:
+        steps:
+            - run:
+                  name: Linting
+                  command: yarn tslint
+    test_all:
+        steps:
+            - run:
+                  name: Running All Tests
+                  command: >
+                      yarn test:circleCi
+    deploy:
+        steps:
+            - run:
+                  name: Deploying
+                  command: >
+                      echo "Simulating deploy... update me with real deploy code"
+
+jobs:
+    build:
+        executor: node
+        steps:
+            - checkout
+            - install_db_client
+            - yarn_install
+            - yarn_lint
+            - *persist_to_workspace
+    test:
+        executor: node
+        steps:
+            - *attach_workspace
+            - test_all
+    deploy:
+        executor: node
+        steps:
+            - *attach_workspace
+            - deploy
+
+workflows:
+    version: 2
+    build-test-and-deploy:
+        jobs:
+            - build
+            - test:
+                  requires:
+                      - build
+            - deploy:
+                  requires:
+                      - test
+                  filters:
+                      branches:
+                          only:
+                              - master
